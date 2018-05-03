@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="7352d841-166c-4cc1-8081-c35997131821" name="GPUServer" url="http://141.28.60.12">
+        <fileTransfer host="141.28.60.12" port="12345" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="12345" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

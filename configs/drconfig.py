@@ -1,0 +1,3 @@
+DR_CONFIG = {
+    'loaddir': ''
+}

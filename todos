@@ -1,0 +1,21 @@
+
+
+Image preprocessing
+    - Histogram Equalization
+    - resizing
+    - sorting (train, validation, test)
+
+train models
+    - different architectures
+        - layers
+        - neurons
+        - inputsizes
+    - different learningrates
+    - different epochs
+    - different weights / same amount of pics in classes
+    - maybe use sthelse than generators
+    - save model after each epoch -> /models
+
+evaluate models
+    - pic the best for accuracy and loss
+    - script for modelsubmission -> /submissions

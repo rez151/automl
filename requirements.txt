@@ -1,0 +1,11 @@
+numpy
+pip>=9.0.0
+pandas
+keras
+h5py
+scikit-learn
+scipy
+tensorflow-gpu
+matplotlib
+jupyter
+pillow
