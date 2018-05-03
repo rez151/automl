@@ -1,32 +1,64 @@
+import os
+
 import cv2 as cv2
 import pandas as pd
 
-lines = pd.read_csv("/home/determinants/automl/datasets/trainLabels.csv")
+from util.directories import createDirs
 
 
-for i in lines.values:
-    file = i[0]
-    level = i[1]
+def hefilter(config):
+    labelfile = config['labelfile']
+    loaddir = config['loaddir']
+    classes = config['classes']
+    validationsplit = config['validationsplit']
+    extension = config['fileextension']
 
-    filenr = file.split('_')[0]
-    extension = ".jpeg"
+    lines = pd.read_csv(labelfile)
 
-    loaddir = "/home/determinants/automl/datasets/train/" + str(filelevel)
-    savedir = "/home/determinants/automl/datasets/filtered/train/" + str(filelevel)
+    imgcount = lines.size / 2
+    validcount = imgcount * validationsplit
 
-    if int(filenr) > 40000:
-        loaddir = "/home/determinants/automl/datasets/validation/" + str(filelevel)
-        savedir = "/home/determinants/automl/datasets/filtered/validation/" + str(filelevel)
+    savedir = loaddir + "/he"
+    createDirs(savedir, classes)
 
-    # Open the image file.
-    img = cv2.imread(loaddir + file + '-resized' + extension, 0)
+    counter = 0
 
-    # Apply filter
-    equ = cv2.equalizeHist(img)
+    for i in lines.values:
+        file = i[0]
+        level = i[1]
 
-    # Save it back to disk.
-    cv2.imwrite(savedir + file + '-he' + extension, equ)
+        if counter < imgcount - validcount:
+            if not os.path.exists(savedir + "/train/" + classes[level] + "/" + file + extension):
+                img = cv2.imread(loaddir + "/train/" + classes[level] + "/" + file + extension, 0)
+                equ = cv2.equalizeHist(img)
+                cv2.imwrite(savedir + "/train/" + classes[level] + "/" + file + extension, equ)
+        else:
+            if not os.path.exists(savedir + "/validation/" + classes[level] + "/" + file + extension):
+                img = cv2.imread(loaddir + "/validation/" + classes[level] + "/" + file + extension, 0)
+                equ = cv2.equalizeHist(img)
+                cv2.imwrite(savedir + "/validation/" + classes[level] + "/" + file + extension, equ)
 
-    print(filenr + " / 35127 images filtered")
+        counter += 1
+        if (counter % 100) == 0:
+            print(str(counter) + '/' + str(imgcount))
 
-exit()
+    print("converting testimages...")
+
+    if not os.path.exists(savedir + "/test"):
+        os.makedirs(savedir + "/test")
+
+    files = os.listdir(loaddir + "/test/")
+
+    testcount = len(files)
+    counter = 0
+    for f in files:
+        if not os.path.exists(savedir + "/test/" + f):
+            img = cv2.imread(loaddir + "/test/" + f, 0)
+            equ = cv2.equalizeHist(img)
+            cv2.imwrite(savedir + "/test/" + f, equ)
+
+        counter += 1
+        if (counter % 100) == 0:
+            print(str(counter) + " / " + str(testcount))
+
+    print("filtering done")

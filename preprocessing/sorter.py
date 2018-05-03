@@ -1,16 +1,8 @@
-import os
-
-import pandas as pd
 import shutil
 
+import pandas as pd
 
-def createDirs(loaddir, classes):
-    for c in classes:
-        if not os.path.exists(loaddir + "/train/" + c):
-            os.makedirs(loaddir + "/train/" + c)
-
-        if not os.path.exists(loaddir + "/validation/" + c):
-            os.makedirs(loaddir + "/validation/" + c)
+from util.directories import createDirs
 
 
 def sort(config):
@@ -18,6 +10,7 @@ def sort(config):
     loaddir = config['loaddir']
     classes = config['classes']
     validationsplit = config['validationsplit']
+    extension = config['fileextension']
 
     lines = pd.read_csv(labelfile)
 
@@ -33,11 +26,11 @@ def sort(config):
         level = i[1]
 
         if counter < imgcount - validcount:
-            shutil.move(loaddir + "/train/" + file + ".jpeg",
-                        loaddir + "/train/" + classes[level] + "/" + file + ".jpeg")
+            shutil.move(loaddir + "/train/" + file + extension,
+                        loaddir + "/train/" + classes[level] + "/" + file + extension)
         else:
-            shutil.move(loaddir + "/train/" + file + ".jpeg",
-                        loaddir + "/validation/" + classes[level] + "/" + file + ".jpeg")
+            shutil.move(loaddir + "/train/" + file + extension,
+                        loaddir + "/validation/" + classes[level] + "/" + file + extension)
         counter += 1
         if (counter % 100) == 0:
             print(str(counter) + '/' + str(imgcount))

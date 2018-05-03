@@ -1,4 +1,5 @@
 from configs.drconfig import DR_CONFIG
+from preprocessing.filter import hefilter
 from preprocessing.sorter import sort, revert
 
 
@@ -10,9 +11,11 @@ from preprocessing.sorter import sort, revert
 def main():
 
     #sorting datasets to classdirs and split train/validation
-    sort(DR_CONFIG)
+    #sort(DR_CONFIG)
 
     #preprocess images: resize and filter
+    hefilter(DR_CONFIG)
+
 
 
 
