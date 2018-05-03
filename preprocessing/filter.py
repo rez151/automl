@@ -4,24 +4,11 @@ import pandas as pd
 lines = pd.read_csv("/home/determinants/automl/datasets/trainLabels.csv")
 
 
-def getlevel(levelnr):
-    switcher = {
-        0: "nodr/",
-        1: "mild/",
-        2: "moderate/",
-        3: "severe/",
-        4: "proliferativedr/"
-    }
-
-    return switcher.get(levelnr, "invalid")
-
-
 for i in lines.values:
     file = i[0]
     level = i[1]
 
     filenr = file.split('_')[0]
-    filelevel = getlevel(level)
     extension = ".jpeg"
 
     loaddir = "/home/determinants/automl/datasets/train/" + str(filelevel)
