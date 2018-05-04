@@ -98,12 +98,6 @@ validation_generator = val_datagen.flow_from_directory(
     batch_size=batch_size,
     class_mode='categorical')
 
-"""
-Tensorboard log
-"""
-log_dir = './tf-log/'
-tb_cb = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0)
-# cbks = [tb_cb]
 
 hist = History()
 cbks = [hist]

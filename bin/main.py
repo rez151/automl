@@ -1,26 +1,36 @@
+from bin.trainer import trainWithAlexnet
 from configs.drconfig import DR_CONFIG
 from preprocessing.filter import hefilter
 from preprocessing.sorter import sort, revert
 
-
 # image preprocessing (histogram equalization, resizing, sorting)
 
 # train models (safe after each epoch)
+from test.drprediction import predictdr
+
+"""
+Parameters
+"""
+img_width, img_height = 500, 500
+batch_size = 48
+samples_per_epoch = 1000
+validation_steps = 10
+classes_num = 5
+lr = 0.00007
+epochs = 1
 
 
 def main():
+    # sorting datasets to classdirs and split train/validation
+    # sort(DR_CONFIG)
 
-    #sorting datasets to classdirs and split train/validation
-    #sort(DR_CONFIG)
+    # preprocess images: resize and filter
+    # hefilter(DR_CONFIG)
 
-    #preprocess images: resize and filter
-    hefilter(DR_CONFIG)
+    trainWithAlexnet(DR_CONFIG['loaddir'], img_width, img_height, classes_num, epochs, lr, batch_size,
+                     samples_per_epoch, validation_steps, DR_CONFIG['classweights'])
 
-
-
-
-
-
+    #predictdr(DR_CONFIG, img_width, img_height)
 
 if __name__ == "__main__":
     main()
