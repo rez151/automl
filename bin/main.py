@@ -1,11 +1,10 @@
-from bin.trainer import trainWithAlexnet
+from bin.trainer import trainWithAlexnet, trainDataset
 from configs.drconfig import DR_CONFIG
-from preprocessing.filter import hefilter
-from preprocessing.sorter import sort, revert
 
 # image preprocessing (histogram equalization, resizing, sorting)
 
 # train models (safe after each epoch)
+from preprocessing.localaverage import localAverage
 from test.drprediction import predictdr
 
 """
@@ -16,8 +15,8 @@ batch_size = 48
 samples_per_epoch = 1000
 validation_steps = 10
 classes_num = 5
-lr = 0.00007
-epochs = 1
+lr = 0.0001
+epochs = 200
 
 
 def main():
@@ -26,11 +25,15 @@ def main():
 
     # preprocess images: resize and filter
     # hefilter(DR_CONFIG)
+    localAverage(DR_CONFIG)
+
+    trainDataset(DR_CONFIG)
 
     trainWithAlexnet(DR_CONFIG['loaddir'], img_width, img_height, classes_num, epochs, lr, batch_size,
                      samples_per_epoch, validation_steps, DR_CONFIG['classweights'])
 
-    #predictdr(DR_CONFIG, img_width, img_height)
+    predictdr(DR_CONFIG, img_width, img_height)
+
 
 if __name__ == "__main__":
     main()

@@ -48,7 +48,7 @@ def predictdr(config, width, height):
     counter = 0
     filecount = len(files)
 
-    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/submission.csv"
+    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/submissionla.csv"
     createSubmissionFile(submissionFilePath)
 
     for file in files:
