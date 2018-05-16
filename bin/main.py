@@ -10,14 +10,16 @@ from test.drprediction import predictdr
 Parameters
 """
 PARAMETERS = {
-    'img_width' : 500,
-    'img_height' : 500,
+    'num_gpus' : 2,
+    'img_width' : 224,
+    'img_height' : 224,
     'batch_size' : 16,
-    'samples_per_epoch' : 1000,
-    'validation_steps' : 10,
+    'samples_per_epoch' : 500,
+    'validation_steps' : 3,
     'classes_num' : 5,
     'lr' : 0.0001,
-    'epochs': 1
+    'epochs': 5,
+    'patience' : 10
 
 }
 
