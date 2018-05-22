@@ -43,6 +43,53 @@ def load_alexnet(width, height, classes_num):
     return model
 
 
+def load_customnet(width, height, classes_num, layer, min_filters, max_filters, conv_window=3, pool=3, strides=2,
+                   dense_layers=2,
+                   dense_units=256,
+                   dropout=0.1):
+    with tf.device('/cpu:0'):
+
+        hidden_layers = 0
+
+        model = Sequential()
+        model.add(
+            Conv2D(min_filters, (11, 11), strides=4, activation='relu', padding='same', input_shape=(width, height, 3)))
+        model.add(MaxPooling2D())
+        model.add(BatchNormalization())
+
+        filters = min_filters + 32
+
+        model.add(Conv2D(filters, conv_window, activation='relu', padding='same'))
+        model.add(MaxPooling2D(pool_size=pool, strides=strides))
+
+        filters = min_filters + 32
+        while filters <= max_filters:
+            model.add(Conv2D(filters, conv_window, activation='relu', padding='same'))
+            model.add(BatchNormalization())
+            filters += 32
+            hidden_layers += 1
+
+        if hidden_layers < layer:
+
+            for i in range(hidden_layers, layer):
+                model.add(Conv2D(filters, conv_window, activation='relu', padding='same'))
+                model.add(BatchNormalization())
+
+        model.add(Conv2D(filters, conv_window, activation='relu', padding='same'))
+        model.add(MaxPooling2D(pool_size=pool, strides=strides))
+        model.add(BatchNormalization())
+
+        model.add(Flatten())
+
+        for i in range(dense_layers):
+            model.add(Dense(dense_units, activation='tanh'))
+            model.add(Dropout(dropout))
+
+        model.add(Dense(classes_num, activation='softmax'))
+
+        return model
+
+
 def load_inception_v3(width, height, classes_num):
     with tf.device('/cpu:0'):
         model = InceptionV3(weights=None, input_shape=(width, height, 3), classes=classes_num)
@@ -110,9 +157,4 @@ def load_densenet201(width, height, classes_num):
     with tf.device('/cpu:0'):
         model = DenseNet201(weights=None, input_shape=(width, height, 3), classes=classes_num)
 
-    return model
-
-def load_customnet(width, height, classes_num, layer, pool):
-    with tf.device('/cpu:0'):
-        model = Sequential()
     return model

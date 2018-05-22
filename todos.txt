@@ -19,3 +19,11 @@ train models
 evaluate models
     - pic the best for accuracy and loss
     - script for modelsubmission -> /submissions
+
+
+
+todo 23.5:
+    - grundlagen eines cnn verstehen und schreiben
+    - score verbessern, egal wie
+    - klassenaufteilung pro batch
+    -

@@ -1,16 +1,18 @@
 import os
 
 import keras
+from ipython_genutils.py3compat import xrange
 from keras import optimizers
 from keras.backend import clear_session
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.optimizers import *
+from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import multi_gpu_model
 
 from bin.savecallback import SaveCallback
 from models.architectures import load_alexnet, load_inception_v3, load_xception, load_vgg16, load_vgg19, load_resnet50, \
-    load_inceptionresnet_v2, load_mobilenet, load_densenet121, load_densenet169, load_densenet201
+    load_inceptionresnet_v2, load_mobilenet, load_densenet121, load_densenet169, load_densenet201, load_customnet
 
 
 class Trainer(object):
@@ -39,7 +41,6 @@ class Trainer(object):
 
         # get imagedatagenerators
         self.__train_generator, self.__validation_generator = self.get_generators()
-        self.__train_generator = self.get_generators()
 
         # instantiate optimizers
         self.__optimizers = {
@@ -56,11 +57,19 @@ class Trainer(object):
 
         data_path = self.__loaddir + "/la"
 
-        #train_dir, val_dir = keras.utils.train_valid_split(data_path, 0.1)
 
         train_data_path = self.__loaddir + "/la/train"
-        validation_data_path = self.__loaddir + "/la/validation"
 
+
+        #files_per_class = []
+        #for folder in sorted(os.listdir(train_data_path)):
+        #    if not os.path.isfile(folder):
+        #        files_per_class.append(len(os.listdir(train_data_path + '/' + folder)))
+        #total_files = sum(files_per_class)
+        #class_weights = {}
+        #for i in xrange(len(files_per_class)):
+        #    class_weights[i] = 1 - (float(files_per_class[i]) / total_files)
+        #print(class_weights)
 
 
         datagen = ImageDataGenerator(
@@ -70,11 +79,6 @@ class Trainer(object):
             validation_split=0.1
         )
 
-        #val_datagen = ImageDataGenerator(
-        #    rescale=1. / 255,
-        #    rotation_range=360,
-        #    zoom_range=0.1
-        #)
 
         train_generator = datagen.flow_from_directory(
             train_data_path,
@@ -85,58 +89,63 @@ class Trainer(object):
         )
 
         validation_data = datagen.flow_from_directory(
-            validation_data_path,
+            train_data_path,
             target_size=(self.__height, self.__width),
             batch_size=self.__batch_size,
             class_mode='categorical',
             subset='validation'
         )
 
+
         return train_generator, validation_data
 
     def start(self):
-        for optimizer in self.__optimizers:
 
+        for optimizer in self.__optimizers:
+            for f in range(32, 512, 32):
+                for l in range(5, 30, 5):
+                    model = load_customnet( self.__width, self.__height, self.__classes_num, l, f, 512)
+                    self.train('custom_'+ str(f) + "_" + str(l), model, optimizer)
             model = load_alexnet(self.__width, self.__height, self.__classes_num)
             self.train('alexnet', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_inception_v3(self.__width, self.__height, self.__classes_num)
             self.train('inception', model, optimizer)
 
-            #clear_session()
-            #model = load_xception(self.__width, self.__height, self.__classes_num)
-            #self.train('Xception', model, optimizer)
+            clear_session()
+            model = load_xception(self.__width, self.__height, self.__classes_num)
+            self.train('Xception', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_vgg16(self.__width, self.__height, self.__classes_num)
             self.train('VGG16', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_vgg19(self.__width, self.__height, self.__classes_num)
             self.train('VGG19', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_resnet50(self.__width, self.__height, self.__classes_num)
             self.train('ResNet50', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_inceptionresnet_v2(self.__width, self.__height, self.__classes_num)
             self.train('InceptionResNetV2', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_mobilenet(self.__width, self.__height, self.__classes_num)
             self.train('MobileNet', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_densenet121(self.__width, self.__height, self.__classes_num)
             self.train('DenseNet121', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_densenet169(self.__width, self.__height, self.__classes_num)
             self.train('DenseNet169', model, optimizer)
 
-            #clear_session()
+            clear_session()
             model = load_densenet201(self.__width, self.__height, self.__classes_num)
             self.train('DenseNet201', model, optimizer)
 

@@ -13,13 +13,13 @@ PARAMETERS = {
     'num_gpus' : 2,
     'img_width' : 224,
     'img_height' : 224,
-    'batch_size' : 16,
-    'samples_per_epoch' : 500,
+    'batch_size' : 64,
+    'samples_per_epoch' : 1000,
     'validation_steps' : 3,
     'classes_num' : 5,
     'lr' : 0.0001,
-    'epochs': 5,
-    'patience' : 10
+    'epochs': 200,
+    'patience' : 20
 
 }
 
