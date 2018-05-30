@@ -11,15 +11,15 @@ Parameters
 """
 PARAMETERS = {
     'num_gpus' : 2,
-    'img_width' : 224,
-    'img_height' : 224,
-    'batch_size' : 64,
+    'img_width' : 512,
+    'img_height' : 512,
+    'batch_size' : 32,
     'samples_per_epoch' : 1000,
     'validation_steps' : 3,
     'classes_num' : 5,
     'lr' : 0.0001,
     'epochs': 200,
-    'patience' : 20
+    'patience' : 50
 
 }
 
@@ -33,11 +33,13 @@ def main():
     # localAverage(DR_CONFIG)
 
 
-    trainer = Trainer(DR_CONFIG, PARAMETERS)
-    trainer.start()
+    #trainer = Trainer(DR_CONFIG, PARAMETERS)
+    #trainer.start()
 
+    from preprocessing.resizer import resize_test
+    resize_test(512,512)
 
-    #predictdr(DR_CONFIG, PARAMETERS['img_width'], PARAMETERS['img_height'])
+    predictdr(DR_CONFIG, PARAMETERS['img_width'], PARAMETERS['img_height'])
 
 
 if __name__ == "__main__":

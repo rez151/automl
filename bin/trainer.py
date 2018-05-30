@@ -9,10 +9,12 @@ from keras.optimizers import *
 from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import multi_gpu_model
+from sklearn.utils import compute_class_weight
 
 from bin.savecallback import SaveCallback
 from models.architectures import load_alexnet, load_inception_v3, load_xception, load_vgg16, load_vgg19, load_resnet50, \
-    load_inceptionresnet_v2, load_mobilenet, load_densenet121, load_densenet169, load_densenet201, load_customnet
+    load_inceptionresnet_v2, load_mobilenet, load_densenet121, load_densenet169, load_densenet201, load_customnet, \
+    load_2nd_place, load_m42
 
 
 class Trainer(object):
@@ -57,20 +59,17 @@ class Trainer(object):
 
         data_path = self.__loaddir + "/la"
 
+        train_data_path = self.__loaddir + "/equal/train"
 
-        train_data_path = self.__loaddir + "/la/train"
-
-
-        #files_per_class = []
-        #for folder in sorted(os.listdir(train_data_path)):
+        # files_per_class = []
+        # for folder in sorted(os.listdir(train_data_path)):
         #    if not os.path.isfile(folder):
         #        files_per_class.append(len(os.listdir(train_data_path + '/' + folder)))
-        #total_files = sum(files_per_class)
-        #class_weights = {}
-        #for i in xrange(len(files_per_class)):
+        # total_files = sum(files_per_class)
+        # class_weights = {}
+        # for i in xrange(len(files_per_class)):
         #    class_weights[i] = 1 - (float(files_per_class[i]) / total_files)
-        #print(class_weights)
-
+        # print(class_weights)
 
         datagen = ImageDataGenerator(
             rescale=1. / 255,
@@ -79,14 +78,16 @@ class Trainer(object):
             validation_split=0.1
         )
 
-
         train_generator = datagen.flow_from_directory(
             train_data_path,
             target_size=(self.__height, self.__width),
             batch_size=self.__batch_size,
             class_mode='categorical',
-            subset='training'
+            subset='training',
+            save_to_dir='/home/determinants/automl/datasets/diabetic-retinopathy-detection/savedir'
         )
+
+        asdf = self.balanced_flow_from_directory(train_generator)
 
         validation_data = datagen.flow_from_directory(
             train_data_path,
@@ -96,16 +97,34 @@ class Trainer(object):
             subset='validation'
         )
 
+        print(asdf)
 
         return train_generator, validation_data
+
+    def balanced_flow_from_directory(self, flow_from_directory):
+        for x, y in flow_from_directory:
+            yield self.custom_balance(x, y)
+
+    def custom_balance(self, x, y):
+        print(x)
+        print(y)
 
     def start(self):
 
         for optimizer in self.__optimizers:
-            for f in range(32, 512, 32):
-                for l in range(5, 30, 5):
-                    model = load_customnet( self.__width, self.__height, self.__classes_num, l, f, 512)
-                    self.train('custom_'+ str(f) + "_" + str(l), model, optimizer)
+            #for f in range(32, 512, 32):
+            #    for l in range(5, 30, 5):
+            #        model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
+            #        self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
+
+
+
+            model = load_m42(self.__width, self.__height, self.__classes_num)
+            self.train('m42', model, optimizer)
+
+            model = load_2nd_place(self.__width, self.__height, self.__classes_num)
+            self.train('second place', model, optimizer)
+
             model = load_alexnet(self.__width, self.__height, self.__classes_num)
             self.train('alexnet', model, optimizer)
 
@@ -166,9 +185,9 @@ class Trainer(object):
         # USE MORE GPUS
         parallel_model = multi_gpu_model(model, gpus=2)
 
-
         parallel_model.compile(loss='categorical_crossentropy',
-                               optimizer=self.__optimizers[optimizer],
+                               #optimizer=self.__optimizers[optimizer],
+                               optimizer=self.__optimizers['adam'],
                                metrics=['accuracy'])
 
         model.summary()
@@ -180,6 +199,6 @@ class Trainer(object):
             epochs=self.__epochs,
             validation_data=self.__validation_generator,
             validation_steps=self.__validation_steps,
-            class_weight=self.__class_weights,
+            #class_weight=self.__class_weights,
             callbacks=[save_callback, early_stopping]
         )
