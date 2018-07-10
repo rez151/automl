@@ -32,6 +32,53 @@ def load_2nd_place(width, height, classes_num):
     return model
 
 
+def load_usuyama(width, height, classes_num):
+    with tf.device('/cpu:0'):
+        model = Sequential()
+
+        model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(512, 512, 3)))
+        model.add(Conv2D(32, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Conv2D(64, (3, 3), activation='relu'))
+        model.add(Conv2D(64, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Conv2D(96, (3, 3), activation='relu'))
+        model.add(Conv2D(96, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Conv2D(128, (3, 3), activation='relu'))
+        model.add(Conv2D(128, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Conv2D(192, (3, 3), activation='relu'))
+        model.add(Conv2D(192, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Conv2D(256, (3, 3), activation='relu'))
+        model.add(Conv2D(256, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Conv2D(256, (3, 3), activation='relu'))
+
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        model.add(Flatten())
+
+        model.add(Dense(256, activation='relu'))
+        model.add(Dense(classes_num, activation='softmax'))
+
+        return model
+
+
+
 def load_m42(width, height, classes_num):
     with tf.device('/cpu:0'):
         model = Sequential()

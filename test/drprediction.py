@@ -39,7 +39,7 @@ def appendToFile(filepath, file, prediction):
         csvfile.close()
 
 def predictdr(config, width, height):
-    model = load_model("/home/determinants/automl/reports/second place_ep_57_val_loss_1.59_val_acc_0.28.h5")
+    model = load_model("/home/determinants/automl/reports/last0.h5")
 
     testdir = config['loaddir'] + "/la/test500/"
 
@@ -48,7 +48,7 @@ def predictdr(config, width, height):
     counter = 0
     filecount = len(files)
 
-    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/second.csv"
+    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/last.csv"
     createSubmissionFile(submissionFilePath)
 
     for file in files:
@@ -59,3 +59,36 @@ def predictdr(config, width, height):
 
         counter += 1
         print(str(counter) + " / " + str(filecount))
+
+
+def predict_all_models(config, width, height):
+    loaddir = "/home/determinants/automl/reports/"
+    directory = os.fsencode(loaddir)
+
+    for file in sorted(os.listdir(directory)):
+        filename = os.fsdecode(file)
+        print(loaddir + filename)
+
+        model = load_model(loaddir + filename)
+
+        testdir = config['loaddir'] + "/la/test500/"
+
+        files = os.listdir(testdir)
+
+        counter = 0
+        filecount = len(files)
+
+        submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/" + filename +".csv"
+
+        if submissionFilePath != "/home/determinants/automl/datasets/diabetic-retinopathy-detection/custom_32_10_ep_82_val_loss_1.60_val_acc_0.22.h5.csv":
+
+            createSubmissionFile(submissionFilePath)
+
+            for file in files:
+                new_image = load_image(testdir + file, width, height)
+                pred = model.predict(new_image)
+                classes = pred.argmax(axis=-1)
+                appendToFile(submissionFilePath, file.replace(".jpeg", ""), str(classes[0]))
+
+                counter += 1
+                print(str(counter) + " / " + str(filecount))

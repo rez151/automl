@@ -10,3 +10,5 @@ tensorflow-gpu
 matplotlib
 jupyter
 pillow
+pydot
+graphviz

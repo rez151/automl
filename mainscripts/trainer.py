@@ -4,17 +4,15 @@ import keras
 from ipython_genutils.py3compat import xrange
 from keras import optimizers
 from keras.backend import clear_session
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from keras.optimizers import *
 from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
-from keras.utils import multi_gpu_model
+from keras.utils import multi_gpu_model, plot_model
 from sklearn.utils import compute_class_weight
 
-from bin.savecallback import SaveCallback
-from models.architectures import load_alexnet, load_inception_v3, load_xception, load_vgg16, load_vgg19, load_resnet50, \
-    load_inceptionresnet_v2, load_mobilenet, load_densenet121, load_densenet169, load_densenet201, load_customnet, \
-    load_2nd_place, load_m42
+from mainscripts.savecallback import SaveCallback
+from models.architectures import *
 
 
 class Trainer(object):
@@ -40,6 +38,8 @@ class Trainer(object):
         self.__lr = parameters['lr']
         self.__epochs = parameters['epochs']
         self.__patience = parameters['patience']
+
+        self.counter = 0
 
         # get imagedatagenerators
         self.__train_generator, self.__validation_generator = self.get_generators()
@@ -83,8 +83,8 @@ class Trainer(object):
             target_size=(self.__height, self.__width),
             batch_size=self.__batch_size,
             class_mode='categorical',
-            subset='training',
-            save_to_dir='/home/determinants/automl/datasets/diabetic-retinopathy-detection/savedir'
+            subset='training'
+            #save_to_dir='/home/determinants/automl/datasets/diabetic-retinopathy-detection/savedir'
         )
 
         asdf = self.balanced_flow_from_directory(train_generator)
@@ -111,13 +111,20 @@ class Trainer(object):
 
     def start(self):
 
+
+
+
+
         for optimizer in self.__optimizers:
-            #for f in range(32, 512, 32):
-            #    for l in range(5, 30, 5):
-            #        model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
-            #        self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
 
+            for f in range(32, 512, 32):
+                for l in range(5, 30, 5):
+                    model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
+                    self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
+                    self.counter += 1
 
+            model = load_usuyama(self.__width, self.__height, self.__classes_num)
+            self.train('usuyama', model, self.__optimizers['sgd'])
 
             model = load_m42(self.__width, self.__height, self.__classes_num)
             self.train('m42', model, optimizer)
@@ -175,6 +182,8 @@ class Trainer(object):
         #    '/home/determinants/automl/reports/' + modelname + '_' + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
         #    save_best_only=True)
 
+        #plot_model(model, to_file='/home/determinants/automl/models/' + str(modelname) + '.png', show_shapes=True)
+
         print("train with: " + modelname)
         print("optimizer : " + optimizer)
 
@@ -187,10 +196,16 @@ class Trainer(object):
 
         parallel_model.compile(loss='categorical_crossentropy',
                                #optimizer=self.__optimizers[optimizer],
-                               optimizer=self.__optimizers['adam'],
+                               #optimizer=self.__optimizers['adam'],
+                               optimizer=SGD(lr=0.003, momentum=0.9, nesterov=True),
                                metrics=['accuracy'])
 
         model.summary()
+
+        callbacks = [save_callback,
+                     early_stopping,
+                     ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, verbose=1, mode='auto', epsilon=0.01,
+                                       cooldown=0, min_lr=1e-6)]
 
         parallel_model.fit_generator(
             use_multiprocessing=True,
@@ -200,5 +215,7 @@ class Trainer(object):
             validation_data=self.__validation_generator,
             validation_steps=self.__validation_steps,
             #class_weight=self.__class_weights,
-            callbacks=[save_callback, early_stopping]
+            callbacks=callbacks
         )
+
+        model.save("/home/determinants/automl/reports/last" + str(self.counter) + ".h5")
