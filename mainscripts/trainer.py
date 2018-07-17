@@ -57,7 +57,6 @@ class Trainer(object):
 
     def get_generators(self):
 
-        data_path = self.__loaddir + "/la"
 
         train_data_path = self.__loaddir + "/equal/train"
 
@@ -74,7 +73,6 @@ class Trainer(object):
         datagen = ImageDataGenerator(
             rescale=1. / 255,
             rotation_range=360,
-            zoom_range=0.1,
             validation_split=0.1
         )
 
@@ -87,7 +85,6 @@ class Trainer(object):
             #save_to_dir='/home/determinants/automl/datasets/diabetic-retinopathy-detection/savedir'
         )
 
-        asdf = self.balanced_flow_from_directory(train_generator)
 
         validation_data = datagen.flow_from_directory(
             train_data_path,
@@ -97,47 +94,37 @@ class Trainer(object):
             subset='validation'
         )
 
-        print(asdf)
 
         return train_generator, validation_data
 
-    def balanced_flow_from_directory(self, flow_from_directory):
-        for x, y in flow_from_directory:
-            yield self.custom_balance(x, y)
-
-    def custom_balance(self, x, y):
-        print(x)
-        print(y)
 
     def start(self):
 
-
-
-
-
         for optimizer in self.__optimizers:
 
-            for f in range(32, 512, 32):
-                for l in range(5, 30, 5):
-                    model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
-                    self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
-                    self.counter += 1
+            # for f in range(32, 512, 32):
+            #     for l in range(5, 30, 5):
+            #         model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
+            #         self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
+            #         self.counter += 1
 
             model = load_usuyama(self.__width, self.__height, self.__classes_num)
-            self.train('usuyama', model, self.__optimizers['sgd'])
+            self.train('usuyama', model, optimizer)
 
-            model = load_m42(self.__width, self.__height, self.__classes_num)
-            self.train('m42', model, optimizer)
+            #model = load_m42(self.__width, self.__height, self.__classes_num)
+            #self.train('m42', model, optimizer)
+#
+            #model = load_2nd_place(self.__width, self.__height, self.__classes_num)
+            #self.train('second place', model, optimizer)
+#
+            #clear_session()
+            #model = load_inception_v3(self.__width, self.__height, self.__classes_num)
+            #self.train('inception', model, optimizer)
 
-            model = load_2nd_place(self.__width, self.__height, self.__classes_num)
-            self.train('second place', model, optimizer)
-
+            '''
             model = load_alexnet(self.__width, self.__height, self.__classes_num)
             self.train('alexnet', model, optimizer)
 
-            clear_session()
-            model = load_inception_v3(self.__width, self.__height, self.__classes_num)
-            self.train('inception', model, optimizer)
 
             clear_session()
             model = load_xception(self.__width, self.__height, self.__classes_num)
@@ -174,8 +161,9 @@ class Trainer(object):
             clear_session()
             model = load_densenet201(self.__width, self.__height, self.__classes_num)
             self.train('DenseNet201', model, optimizer)
+            '''
+            return 0
 
-        return 0
 
     def train(self, modelname, model, optimizer):
         # checkpoint = ModelCheckpoint(
@@ -200,7 +188,7 @@ class Trainer(object):
                                optimizer=SGD(lr=0.003, momentum=0.9, nesterov=True),
                                metrics=['accuracy'])
 
-        model.summary()
+
 
         callbacks = [save_callback,
                      early_stopping,

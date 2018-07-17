@@ -15,12 +15,12 @@ PARAMETERS = {
     'img_width' : 512,
     'img_height' : 512,
     'batch_size' : 32,
-    'samples_per_epoch' : 5000,
+    'samples_per_epoch' : 1000,
     'validation_steps' : 3,
     'classes_num' : 5,
     'lr' : 0.05,
-    'epochs': 1000,
-    'patience' : 50
+    'epochs': 100,
+    'patience' : 30
 
 }
 

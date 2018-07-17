@@ -39,16 +39,16 @@ def appendToFile(filepath, file, prediction):
         csvfile.close()
 
 def predictdr(config, width, height):
-    model = load_model("/home/determinants/automl/reports/last0.h5")
+    model = load_model("/home/determinants/automl/models/usuyama/usuyama_ep_42_val_loss_0.79_val_acc_0.78.h5")
 
-    testdir = config['loaddir'] + "/la/test500/"
+    testdir = config['loaddir'] + "/preprocess/512/test/"
 
     files = os.listdir(testdir)
 
     counter = 0
     filecount = len(files)
 
-    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/last.csv"
+    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/usuyama.csv"
     createSubmissionFile(submissionFilePath)
 
     for file in files:
