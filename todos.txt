@@ -27,3 +27,6 @@ todo 23.5:
     - score verbessern, egal wie
     - klassenaufteilung pro batch
     -
+
+    broken:
+    - /home/determinants/automl/datasets/diabetic-retinopathy-detection/preprocess/512/test/18242_right.jpeg

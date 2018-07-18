@@ -102,14 +102,20 @@ class Trainer(object):
 
         for optimizer in self.__optimizers:
 
-            # for f in range(32, 512, 32):
-            #     for l in range(5, 30, 5):
-            #         model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
-            #         self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
-            #         self.counter += 1
+            #for f in range(32, 512, 32):
+            #    for l in range(5, 30, 5):
+            #        model = load_customnet(self.__width, self.__height, self.__classes_num, l, f, 512)
+            #        self.train('custom_' + str(f) + "_" + str(l), model, optimizer)
+            #        self.counter += 1
 
-            model = load_usuyama(self.__width, self.__height, self.__classes_num)
-            self.train('usuyama', model, optimizer)
+            #model = load_customnet(self.__width, self.__height, self.__classes_num, 50, 256, 512, dense_units=2048)
+            #self.train('custom_' + str(30) + "_" + str(256) + "_" + str(512), model, optimizer)
+
+            #model = load_usuyama(self.__width, self.__height, self.__classes_num)
+            #self.train('usuyama', model, optimizer)
+
+            model = load_inception_v3(self.__width, self.__height, self.__classes_num)
+            self.train('inceptionv3', model, optimizer)
 
             #model = load_m42(self.__width, self.__height, self.__classes_num)
             #self.train('m42', model, optimizer)
@@ -185,7 +191,7 @@ class Trainer(object):
         parallel_model.compile(loss='categorical_crossentropy',
                                #optimizer=self.__optimizers[optimizer],
                                #optimizer=self.__optimizers['adam'],
-                               optimizer=SGD(lr=0.003, momentum=0.9, nesterov=True),
+                               optimizer=SGD(lr=0.01, momentum=0.9, nesterov=True),
                                metrics=['accuracy'])
 
 

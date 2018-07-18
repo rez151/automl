@@ -39,7 +39,7 @@ def appendToFile(filepath, file, prediction):
         csvfile.close()
 
 def predictdr(config, width, height):
-    model = load_model("/home/determinants/automl/models/usuyama/usuyama_ep_42_val_loss_0.79_val_acc_0.78.h5")
+    model = load_model("/home/determinants/automl/models/inceptionv3/inceptionv3_ep_1_val_loss_1.31_val_acc_0.39.h5")
 
     testdir = config['loaddir'] + "/preprocess/512/test/"
 
@@ -48,17 +48,17 @@ def predictdr(config, width, height):
     counter = 0
     filecount = len(files)
 
-    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/usuyama.csv"
+    submissionFilePath = "/home/determinants/automl/datasets/diabetic-retinopathy-detection/inception.csv"
     createSubmissionFile(submissionFilePath)
 
     for file in files:
+        print(str(counter) + " / " + str(filecount) + ": " + str(file))
         new_image = load_image(testdir + file, width, height)
         pred = model.predict(new_image)
         classes = pred.argmax(axis=-1)
         appendToFile(submissionFilePath, file.replace(".jpeg", ""), str(classes[0]))
 
         counter += 1
-        print(str(counter) + " / " + str(filecount))
 
 
 def predict_all_models(config, width, height):
